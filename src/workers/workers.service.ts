@@ -16,9 +16,24 @@ export class WorkersService {
   }
 
   async findOne(id: string) {
-    return await this.drizzle.query.workers.findFirst({
+    const worker = await this.drizzle.query.workers.findFirst({
       where: (worker, { eq }) => eq(worker.id, id),
     });
+
+    if (!worker) {
+      throw new HttpException(
+        {
+          message: 'The worker with the specified ID was not found',
+          error: 'Bad Request',
+          status: HttpStatus.NOT_FOUND,
+        },
+        HttpStatus.NOT_FOUND,
+        {
+          cause: 'The worker with the specified ID was not found',
+        },
+      );
+    }
+    return worker;
   }
 
   async create(data: WorkerInsert) {

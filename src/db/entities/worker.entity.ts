@@ -12,7 +12,9 @@ export const workers = sqliteTable('worker', {
   name: text('name').notNull(),
   salary: integer('salary').notNull(),
   // ownerId: integer('owner_id').references(() => employers.id), // Owner ID Could be used, but it's not necessary
-  jobId: text('job_id').references(() => jobs.id),
+  jobId: text('job_id').references(() => jobs.id, {
+    onDelete: 'set null',
+  }),
 });
 
 export const workerRelation = relations(workers, ({ one, many }) => ({

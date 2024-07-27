@@ -12,9 +12,24 @@ export class EmployersService {
   }
 
   async findOne(id: string) {
-    return await this.drizzle.query.employers.findFirst({
+    const employer = await this.drizzle.query.employers.findFirst({
       where: (employer, { eq }) => eq(employer.id, id),
     });
+
+    if (!employer) {
+      throw new HttpException(
+        {
+          message: 'The employer with the specified ID was not found',
+          error: 'Bad Request',
+          status: HttpStatus.NOT_FOUND,
+        },
+        HttpStatus.NOT_FOUND,
+        {
+          cause: 'The employer with the specified ID was not found',
+        },
+      );
+    }
+    return employer;
   }
 
   async getWorkers(id: string) {

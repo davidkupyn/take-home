@@ -22,9 +22,24 @@ export class JobsService {
   }
 
   async findOne(id: string) {
-    return await this.drizzle.query.jobs.findFirst({
+    const job = await this.drizzle.query.jobs.findFirst({
       where: (job, { eq }) => eq(job.id, id),
     });
+
+    if (!job) {
+      throw new HttpException(
+        {
+          message: 'The job with the specified ID was not found',
+          error: 'Bad Request',
+          status: HttpStatus.NOT_FOUND,
+        },
+        HttpStatus.NOT_FOUND,
+        {
+          cause: 'The job with the specified ID was not found',
+        },
+      );
+    }
+    return job;
   }
 
   async findGreaterSalary(
