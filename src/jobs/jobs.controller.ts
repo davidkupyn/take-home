@@ -4,13 +4,13 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Put,
   Query,
   UsePipes,
 } from '@nestjs/common';
-import { JobInsert } from './job.entity';
+import { JobInsert } from '../db/entities/job.entity';
 import { JobsService } from './jobs.service';
 import { ZodValidationPipe } from 'src/common/pipes/zodValidationPipe';
 import { createJobSchema } from './dto/createJob.dto';
@@ -35,7 +35,7 @@ export class JobsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return await this.jobsService.findOne(id);
   }
 
@@ -47,19 +47,19 @@ export class JobsController {
 
   @Put(':id')
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body(new ZodValidationPipe(updateJobSchema)) data: JobInsert,
   ) {
     return this.jobsService.update(id, data);
   }
 
   @Delete(':id')
-  async delete(@Param('id', ParseIntPipe) id: number) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.jobsService.delete(id);
   }
 
   @Put(':id/archive')
-  async archive(@Param('id', ParseIntPipe) id: number) {
+  async archive(@Param('id', ParseUUIDPipe) id: string) {
     return this.jobsService.archive(id);
   }
 }

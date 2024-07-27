@@ -1,11 +1,14 @@
 import { relations, sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { createInsertSchema } from 'drizzle-zod';
-import { employers } from 'src/employers/employer.entity';
-import { history, workers } from 'src/workers/worker.entity';
+import { employers } from './employer.entity';
+import { workers } from './worker.entity';
+import { history } from './history.entity';
 
 export const jobs = sqliteTable('job', {
-  id: integer('id').primaryKey(),
+  id: text('id')
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   status: text('status', {
     enum: ['draft', 'active', 'archive'],
   }).notNull(),
@@ -14,7 +17,9 @@ export const jobs = sqliteTable('job', {
     sql`(cast (unixepoch () as int))`,
   ),
   salary: integer('salary').notNull(),
-  ownerId: integer('owner_id').references(() => employers.id),
+  ownerId: text('owner_id').references(() => employers.id, {
+    onDelete: 'cascade',
+  }),
 });
 
 export const jobRelation = relations(jobs, ({ one, many }) => ({
@@ -25,8 +30,6 @@ export const jobRelation = relations(jobs, ({ one, many }) => ({
   workers: many(workers),
   history: many(history),
 }));
-
-export const jobInsertSchema = createInsertSchema(jobs);
 
 export type Job = typeof jobs.$inferSelect;
 export type JobInsert = typeof jobs.$inferInsert;

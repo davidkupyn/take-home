@@ -1,4 +1,4 @@
 import { createInsertSchema } from 'drizzle-zod';
-import { workers } from '../worker.entity';
+import { workers } from '../../db/entities/worker.entity';
 
 export const createWorkerSchema = createInsertSchema(workers);

@@ -4,17 +4,18 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Put,
   Query,
   UsePipes,
 } from '@nestjs/common';
-import { WorkerInsert } from './worker.entity';
-import { WorkersService } from './workers.service';
+import { OptionalParseUUIDPipe } from 'src/common/pipes/optionalParseUuidPipe';
 import { ZodValidationPipe } from 'src/common/pipes/zodValidationPipe';
 import { createWorkerSchema } from './dto/createWorker.dto';
 import { updateWorkerSchema } from './dto/updateWorker.dto';
+import { WorkerInsert } from '../db/entities/worker.entity';
+import { WorkersService } from './workers.service';
 
 @Controller('workers')
 export class WorkersController {
@@ -26,7 +27,7 @@ export class WorkersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return await this.workersService.findOne(id);
   }
 
@@ -38,26 +39,26 @@ export class WorkersController {
 
   @Put(':id')
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body(new ZodValidationPipe(updateWorkerSchema)) data: WorkerInsert,
   ) {
     return this.workersService.update(id, data);
   }
 
   @Delete(':id')
-  async delete(@Param('id', ParseIntPipe) id: number) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.workersService.delete(id);
   }
 
   @Get(':id/matched-jobs')
-  async getMatchingJobs(@Param('id', ParseIntPipe) id: number) {
+  async getMatchingJobs(@Param('id', ParseUUIDPipe) id: string) {
     return this.workersService.getMatchingJobs(id);
   }
 
   @Put(':id/new-employer')
   async changeEmployer(
-    @Param('id', ParseIntPipe) workerId: number,
-    @Query('job', ParseIntPipe) job: number,
+    @Param('id', ParseUUIDPipe) workerId: number,
+    @Query('job', OptionalParseUUIDPipe) job?: number,
   ) {
     return this.workersService.changeEmployer(workerId, job);
   }

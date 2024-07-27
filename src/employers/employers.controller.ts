@@ -4,12 +4,12 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Put,
   UsePipes,
 } from '@nestjs/common';
-import { EmployerInsert } from './employer.entity';
+import { EmployerInsert } from '../db/entities/employer.entity';
 import { EmployersService } from './employers.service';
 import { ZodValidationPipe } from 'src/common/pipes/zodValidationPipe';
 import { createEmployerSchema } from './dto/createEmployer.dto';
@@ -25,7 +25,7 @@ export class EmployersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return await this.employersService.findOne(id);
   }
 
@@ -37,19 +37,19 @@ export class EmployersController {
 
   @Put(':id')
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body(new ZodValidationPipe(updateEmployerSchema)) data: EmployerInsert,
   ) {
     return this.employersService.update(id, data);
   }
 
   @Delete(':id')
-  async delete(@Param('id', ParseIntPipe) id: number) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.employersService.delete(id);
   }
 
   @Get(':id/workers')
-  async getWorkers(@Param('id', ParseIntPipe) id: number) {
+  async getWorkers(@Param('id', ParseUUIDPipe) id: string) {
     return this.employersService.getWorkers(id);
   }
 }

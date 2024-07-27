@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Drizzle } from 'src/db/schema';
-import { EmployerInsert, employers } from './employer.entity';
+import { Drizzle } from 'src/db/db.module';
+import { EmployerInsert, employers } from '../db/entities/employer.entity';
 import { eq } from 'drizzle-orm';
 
 @Injectable()
@@ -11,16 +11,16 @@ export class EmployersService {
     return await this.drizzle.query.employers.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return await this.drizzle.query.employers.findFirst({
-      where: (table, { eq }) => eq(table.id, id),
+      where: (employer, { eq }) => eq(employer.id, id),
     });
   }
 
-  async getWorkers(id: number) {
+  async getWorkers(id: string) {
     return (
       await this.drizzle.query.employers.findFirst({
-        where: (table, { eq }) => eq(table.id, id),
+        where: (employer, { eq }) => eq(employer.id, id),
         with: {
           jobs: {
             with: {
@@ -36,11 +36,11 @@ export class EmployersService {
     await this.drizzle.insert(employers).values(data);
   }
 
-  async update(id: number, data: EmployerInsert) {
+  async update(id: string, data: EmployerInsert) {
     await this.drizzle.update(employers).set(data).where(eq(employers.id, id));
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     await this.drizzle.delete(employers).where(eq(employers.id, id));
   }
 }
