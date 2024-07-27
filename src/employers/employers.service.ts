@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Drizzle } from 'src/db/db.module';
 import { EmployerInsert, employers } from '../db/entities/employer.entity';
 import { eq } from 'drizzle-orm';
@@ -33,14 +33,52 @@ export class EmployersService {
   }
 
   async create(data: EmployerInsert) {
-    await this.drizzle.insert(employers).values(data);
+    return (
+      await this.drizzle
+        .insert(employers)
+        .values(data)
+        .returning({ id: employers.id })
+    )[0];
   }
 
   async update(id: string, data: EmployerInsert) {
-    await this.drizzle.update(employers).set(data).where(eq(employers.id, id));
+    const response = await this.drizzle
+      .update(employers)
+      .set(data)
+      .where(eq(employers.id, id));
+
+    if (response.rowsAffected === 0) {
+      throw new HttpException(
+        {
+          message: 'The employer with the specified ID was not found',
+          error: 'Bad Request',
+          status: HttpStatus.NOT_FOUND,
+        },
+        HttpStatus.NOT_FOUND,
+        {
+          cause: 'The employer with the specified ID was not found',
+        },
+      );
+    }
   }
 
   async delete(id: string) {
-    await this.drizzle.delete(employers).where(eq(employers.id, id));
+    const response = await this.drizzle
+      .delete(employers)
+      .where(eq(employers.id, id));
+
+    if (response.rowsAffected === 0) {
+      throw new HttpException(
+        {
+          message: 'The employer with the specified ID was not found',
+          error: 'Bad Request',
+          status: HttpStatus.NOT_FOUND,
+        },
+        HttpStatus.NOT_FOUND,
+        {
+          cause: 'The employer with the specified ID was not found',
+        },
+      );
+    }
   }
 }
