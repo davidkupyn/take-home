@@ -32,6 +32,7 @@ export class EmployersService {
     return employer;
   }
 
+  // Joins the employers table with the jobs table and then with the workers table
   async getWorkers(id: string) {
     return (
       await this.drizzle.query.employers.findFirst({

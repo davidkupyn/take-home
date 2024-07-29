@@ -49,6 +49,7 @@ export class JobsService {
     },
   ) {
     const filters = [gte(jobs.salary, salary), eq(jobs.status, 'active')];
+
     if (options?.excludedJobId) {
       filters.push(ne(jobs.id, options.excludedJobId));
     }
